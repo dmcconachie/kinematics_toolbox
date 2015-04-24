@@ -24,7 +24,6 @@ Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta);
 
 Matrix6Xd bodyJacobian(const std::vector<Vector6d> &twists, const std::vector<double> &theta, const Eigen::Matrix4d &g_theta);
 
-
 };
 
 #endif

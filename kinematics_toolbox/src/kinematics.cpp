@@ -8,7 +8,7 @@ using namespace kinematics;
 // Skew and Unskew for 3x3 matrices
 ////////////////////////////////////////////////////////////////////////////////
 
-Eigen::Matrix3d skew(const Eigen::Vector3d w)
+Eigen::Matrix3d kinematics::skew(const Eigen::Vector3d &w)
 {
     Eigen::Matrix3d w_hat;
 
@@ -19,7 +19,7 @@ Eigen::Matrix3d skew(const Eigen::Vector3d w)
     return w_hat;
 }
 
-Eigen::Vector3d unskew(const Eigen::Matrix3d &w_hat)
+Eigen::Vector3d kinematics::unskew(const Eigen::Matrix3d &w_hat)
 {
     Eigen::Vector3d w;
     Eigen::Matrix3d w_hat_sym;
@@ -35,7 +35,7 @@ Eigen::Vector3d unskew(const Eigen::Matrix3d &w_hat)
 // Twist create, twist hat and unhat
 ////////////////////////////////////////////////////////////////////////////////
 
-Vector6d createTwist(const Eigen::Vector3d &omega, const Eigen::Vector3d &q)
+Vector6d kinematics::createTwist(const Eigen::Vector3d &omega, const Eigen::Vector3d &q)
 {
     Vector6d xi;
 
@@ -53,13 +53,13 @@ Vector6d createTwist(const Eigen::Vector3d &omega, const Eigen::Vector3d &q)
     return xi;
 }
 
-Eigen::Matrix4d twistHat(const Vector6d &xi)
+Eigen::Matrix4d kinematics::twistHat(const Vector6d &xi)
 {
     Eigen::Matrix4d xi_hat = Eigen::Matrix4d::Zero();
 
     Eigen::Vector3d v = xi.segment<3>(0);
     Eigen::Vector3d w = xi.segment<3>(3);
-    Eigen::Matrix3d w_hat = kinematics::skew(w); // TODO: figure out why we need kinematics:: before skew
+    Eigen::Matrix3d w_hat = skew(w);
     
     xi_hat.block<3,3>(0,0) = w_hat;
     xi_hat.block<3,1>(0,3) = v;
@@ -67,13 +67,13 @@ Eigen::Matrix4d twistHat(const Vector6d &xi)
     return xi_hat;
 }
 
-Vector6d twistUnhat(const Eigen::Matrix4d &xi_hat)
+Vector6d kinematics::twistUnhat(const Eigen::Matrix4d &xi_hat)
 {
     Vector6d xi;
 
     Eigen::Vector3d v = xi_hat.block<3,1>(0,3);
     Eigen::Matrix3d w_hat = xi_hat.block<3,3>(0,0);
-    Eigen::Vector3d w = kinematics::unskew(w_hat); //TODO: figure out why we need kinematics:: before unskew
+    Eigen::Vector3d w = unskew(w_hat);
     
     xi.segment<3>(0) = v;
     xi.segment<3>(3) = w;
@@ -85,11 +85,11 @@ Vector6d twistUnhat(const Eigen::Matrix4d &xi_hat)
 // Adjoints and twist exponentials
 ////////////////////////////////////////////////////////////////////////////////
 
-Matrix6d adj(const Eigen::Matrix4d &g)
+Matrix6d kinematics::adj(const Eigen::Matrix4d &g)
 {
     Eigen::Matrix3d R = g.block<3,3>(0,0);
     Eigen::Vector3d p = g.block<3,1>(0,3);
-    Eigen::Matrix3d p_hat = kinematics::skew(p); // TODO: figure out why we need kinematics:: before skew
+    Eigen::Matrix3d p_hat = skew(p);
     
     Matrix6d adj_g;
     
@@ -101,7 +101,7 @@ Matrix6d adj(const Eigen::Matrix4d &g)
     return adj_g;
 }
 
-Eigen::Matrix3d expmExact(const Eigen::Matrix3d &w_hat, const double theta)
+Eigen::Matrix3d kinematics::expmExact(const Eigen::Matrix3d &w_hat, const double theta)
 {
     Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
     
@@ -111,7 +111,7 @@ Eigen::Matrix3d expmExact(const Eigen::Matrix3d &w_hat, const double theta)
     return expM;
 }
 
-Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta)
+Eigen::Matrix4d kinematics::expTwist(const Vector6d &twist, const double theta)
 {
     Eigen::Vector3d v = twist.segment<3>(0);
     Eigen::Vector3d w = twist.segment<3>(3);
@@ -125,9 +125,8 @@ Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta)
     }
     else
     {
-        // TODO: figure out why we need kinematics before skew and expmExact
-        Eigen::Matrix3d w_hat = kinematics::skew(w);
-        Eigen::Matrix3d exp_w_hat_theta = kinematics::expmExact(w_hat, theta);
+        Eigen::Matrix3d w_hat = skew(w);
+        Eigen::Matrix3d exp_w_hat_theta = expmExact(w_hat, theta);
         Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
         
         expT.block<3,3>(0,0) = exp_w_hat_theta;
@@ -142,7 +141,7 @@ Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta)
 // Geometric Jacobians
 ////////////////////////////////////////////////////////////////////////////////
 
-Matrix6Xd bodyJacobian(const std::vector<Vector6d> &twists, const std::vector<double> &theta, const Eigen::Matrix4d &g_theta)
+Matrix6Xd kinematics::bodyJacobian(const std::vector<Vector6d> &twists, const std::vector<double> &theta, const Eigen::Matrix4d &g_theta)
 {
     int numTheta = theta.size();
     Matrix6Xd J_s(6,numTheta);
@@ -163,18 +162,15 @@ Matrix6Xd bodyJacobian(const std::vector<Vector6d> &twists, const std::vector<do
         }
         else
         {
-            // TODO: figure out why we need kinematics:: before expTwist and adj
             lastTwist = currentTwist;
             currentTwist = twists[i];
-            expT = kinematics::expTwist(lastTwist, theta[i-1]);
+            expT = expTwist(lastTwist, theta[i-1]);
             g = g * expT;
-            J_s.block<6,1>(0,i) = kinematics::adj(g).inverse()*currentTwist;
+            J_s.block<6,1>(0,i) = adj(g).inverse()*currentTwist;
         }
     }
     
-    // TODO: figure out why we need kinematics:: before adj
-    J_b = kinematics::adj(g_theta).inverse() * J_s;
+    J_b = adj(g_theta).inverse() * J_s;
 
     return J_b;
 }
-
