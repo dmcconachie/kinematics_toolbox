@@ -1,6 +1,7 @@
 #include "kinematics_toolbox/kinematics.h"
 
 #include <math.h>
+#include <vector>
 
 using namespace kinematics;
 
@@ -13,6 +14,30 @@ Eigen::Matrix3f rot_z(double angle)
 		 0,           0,          1;
 
 	return R;
+}
+
+void bodyJacobian(std::vector<Vector6d> *twists, std::vector<double> *theta, Eigen::Matrix4d *g_theta) {
+    
+    /*
+    int numTheta = theta->size();
+    Eigen::Matrix6Xd J_s(6,numTheta);
+    Eigen::Matrix4d g = Eigen::Matrix4d::Identity;
+    
+    for(int i = 0; i < theta; i++) {
+        
+        if (i == 1) {
+            J_s.block<6,1>(0,0) = twists(:,1);
+        }
+        else {
+            g = g * expTwist(twists(:,i-1), theta(i-1));
+            J_s(:,i) = adj(g)*twists(:,i);
+        }
+    }
+    
+    J_s = spatialJacobian(twists, theta);
+    
+    J_b = adj(g_theta) \ J_s;
+    */
 }
 
 void expTwist(Eigen::Matrix4d *expT, Vector6d *twist, double theta) {
@@ -29,10 +54,9 @@ void expTwist(Eigen::Matrix4d *expT, Vector6d *twist, double theta) {
     else {
         Eigen::Matrix3d w_hat;
         skew(&w_hat, &w);
-        w_hat = w_hat * theta;
         
         Eigen::Matrix3d exp_w_hat_theta;
-        expm(&exp_w_hat_theta, &w_hat);
+        expmExact(&exp_w_hat_theta, &w_hat, theta);
         
         Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
         
@@ -43,9 +67,10 @@ void expTwist(Eigen::Matrix4d *expT, Vector6d *twist, double theta) {
     
 }
 
-void expm(Eigen::Matrix3d *expM, Eigen::Matrix3d *M) {
-
-
+void expmExact(Eigen::Matrix3d *expM, Eigen::Matrix3d *w_hat, double theta) {
+    
+    Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
+    (*expM) = eye3 + (*w_hat) * sin(theta) + (*w_hat)*(*w_hat)*(1-cos(theta));
 }
 
 void adj(Matrix6d *adj_G, Eigen::Matrix4d *G) {
