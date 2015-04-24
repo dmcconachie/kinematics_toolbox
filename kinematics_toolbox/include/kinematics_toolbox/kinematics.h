@@ -13,6 +13,7 @@ typedef Eigen::Matrix<double, 6, Eigen::Dynamic> Matrix6Xd;
 
 Eigen::Matrix3f rot_z(double angle);
 
+void createTwist(Vector6d *xi, Eigen::Vector3d *omega, Eigen::Vector3d *q);
 void skew(Eigen::Matrix3d *w_hat, Eigen::Vector3d *w);
 void unskew(Eigen::Vector3d *w, Eigen::Matrix3d *w_hat);
 void twist_hat(Eigen::Matrix4d *s_hat, Vector6d *s);

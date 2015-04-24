@@ -18,26 +18,33 @@ Eigen::Matrix3f rot_z(double angle)
 
 void bodyJacobian(std::vector<Vector6d> *twists, std::vector<double> *theta, Eigen::Matrix4d *g_theta) {
     
-    /*
     int numTheta = theta->size();
-    Eigen::Matrix6Xd J_s(6,numTheta);
-    Eigen::Matrix4d g = Eigen::Matrix4d::Identity;
+    Matrix6Xd J_s(6,numTheta);
+    Matrix6Xd J_b(6,numTheta);
+    Eigen::Matrix4d g = Eigen::Matrix4d::Identity();
+    Vector6d lastTwist;
+    Vector6d currentTwist;
+    Eigen::Matrix4d expT;
+    Matrix6d adjG;
     
-    for(int i = 0; i < theta; i++) {
-        
-        if (i == 1) {
-            J_s.block<6,1>(0,0) = twists(:,1);
+    for(int i = 0; i < numTheta; i++) {
+        if (i == 0) {
+            currentTwist = (*twists)[i];
+            J_s.block<6,1>(0,i) = currentTwist;
         }
         else {
-            g = g * expTwist(twists(:,i-1), theta(i-1));
-            J_s(:,i) = adj(g)*twists(:,i);
+            lastTwist = currentTwist;
+            currentTwist = (*twists)[i];
+            expTwist(&expT, &lastTwist, (*theta)[i-1]);
+            g = g * expT;
+            adj(&adjG, &g);
+            J_s.block<6,1>(0,i) = adjG*currentTwist;
         }
     }
     
-    J_s = spatialJacobian(twists, theta);
+    adj(&adjG, g_theta);
+    J_b = adjG.inverse() * J_s;
     
-    J_b = adj(g_theta) \ J_s;
-    */
 }
 
 void expTwist(Eigen::Matrix4d *expT, Vector6d *twist, double theta) {
@@ -124,6 +131,19 @@ void unskew(Eigen::Vector3d *w, Eigen::Matrix3d *w_hat) {
     Eigen::Matrix3d w_hat_sym;
     w_hat_sym = ((*w_hat) - (*w_hat).transpose())/2;
     (*w) << w_hat_sym(2,1), w_hat_sym(0,2), w_hat_sym(1,0);
+}
+
+void createTwist(Vector6d *xi, Eigen::Vector3d *omega, Eigen::Vector3d *q) {
+    
+    if ((*omega)(0) == 0 && (*omega)(1) == 0 && (*omega)(2) == 0) {
+        (*xi).segment<3>(0) = (*q);
+        (*xi).segment<3>(3) = (*omega);
+    }
+    else {
+        (*xi).segment<3>(0) = -1*(*omega).cross(*q);
+        (*xi).segment<3>(3) = (*omega);
+    }
+    
 }
 
 
