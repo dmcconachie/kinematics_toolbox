@@ -20,9 +20,10 @@ Vector6d twistUnhat(const Eigen::Matrix4d &xi_hat);
 
 Matrix6d adj(const Eigen::Matrix4d &g);
 Eigen::Matrix3d expmExact(const Eigen::Matrix3d &w_hat, const double theta);
-Eigen::matrix4d expTwist(const Vector6d &twist, const double theta);
+Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta);
 
 Matrix6Xd bodyJacobian(const std::vector<Vector6d> &twists, const std::vector<double> &theta, const Eigen::Matrix4d &g_theta);
+
 
 };
 
