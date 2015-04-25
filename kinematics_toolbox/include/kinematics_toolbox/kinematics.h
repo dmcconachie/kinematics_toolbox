@@ -1,7 +1,7 @@
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <vector>
 
 namespace kinematics
