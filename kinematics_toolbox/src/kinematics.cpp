@@ -121,7 +121,7 @@ Eigen::Matrix4d expTwist(const Vector6d &twist, const double theta)
     
     if (w(0)==0 && w(1)==0 && w(2)==0)
     {
-        expT.block<3,1>(0,3) = v;
+        expT.block<3,1>(0,3) = v*theta;
     }
     else
     {
