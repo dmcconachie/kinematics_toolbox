@@ -140,12 +140,12 @@ Eigen::Matrix4d kinematics::expTwist(const Vector6d& xi, const double theta)
     Eigen::Vector3d v = xi.segment<3>(0);
     Eigen::Vector3d w = xi.segment<3>(3);
     
-    Eigen::Matrix4d expT = Eigen::Matrix4d::Zero();
+    Eigen::Matrix4d expT = Eigen::Matrix4d::Identity();
     
     
     if (w(0)==0 && w(1)==0 && w(2)==0)
     {
-        expT.block<3,1>(0,3) = v;
+        expT.block<3,1>(0,3) = v*theta;
     }
     else
     {
@@ -155,7 +155,6 @@ Eigen::Matrix4d kinematics::expTwist(const Vector6d& xi, const double theta)
         
         expT.block<3,3>(0,0) = exp_w_hat_theta;
         expT.block<3,1>(0,3) = (eye3 - exp_w_hat_theta) * w.cross(v) + w*w.transpose()*v*theta;
-        expT(3,3) = 1;
     }
     
     return expT;
