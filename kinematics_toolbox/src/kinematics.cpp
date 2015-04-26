@@ -125,6 +125,22 @@ Matrix6d kinematics::adj(const Eigen::Matrix4d& g)
     return adj_g;
 }
 
+/*Matrix6d kinematics::adjinv(const Eigen::Matrix4d& g)
+{
+    Eigen::Matrix3d R = g.block<3,3>(0,0);
+    Eigen::Vector3d p = g.block<3,1>(0,3);
+    Eigen::Matrix3d p_hat = skew(p);
+    
+    Matrix6d adjinv_g;
+    
+    adjinv_g.block<3,3>(0,0) = R.transpose();
+    adjinv_g.block<3,3>(0,3) = -1*R.trnaspose()*p_hat;
+    adjinv_g.block<3,3>(3,0) = Eigen::Matrix3d::Zero(3,3);
+    adjinv_g.block<3,3>(3,3) = R.transpose();
+    
+    return adjinv_g;
+}*/
+
 Eigen::Matrix3d kinematics::expmExact(const Eigen::Matrix3d& w_hat, const double theta)
 {
     Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
@@ -202,7 +218,7 @@ Matrix6Xd kinematics::bodyJacobian(const std::vector<Vector6d>& xi,
             currentTwist = xi[i];
             expT = expTwist(lastTwist, theta[i-1]);
             g = g * expT;
-            J_s.block<6,1>(0,i) = adj(g).inverse()*currentTwist;
+            J_s.block<6,1>(0,i) = adj(g)*currentTwist;
         }
     }
     
