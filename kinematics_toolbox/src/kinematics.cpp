@@ -166,7 +166,7 @@ Eigen::Matrix4d kinematics::expTwist(const std::vector<Vector6d>& xi,
 
     for (unsigned int i = 0; i < theta.size(); i++)
     {
-      g = expTwist(xi[i], theta[i]) * g;
+      g = g * expTwist(xi[i], theta[i]);
     }
 
     return g;
