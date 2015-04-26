@@ -1,6 +1,6 @@
 #include "kinematics_toolbox/kinematics.h"
 
-#include <math.h>
+#include <cmath>
 #include <unsupported/Eigen/MatrixFunctions>
 
 using namespace kinematics;
@@ -130,7 +130,7 @@ Eigen::Matrix3d kinematics::expmExact(const Eigen::Matrix3d& w_hat, const double
     Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
     
     Eigen::Matrix3d expM;
-    expM = eye3 + w_hat*sin(theta) + w_hat*w_hat*(1-cos(theta));
+    expM = eye3 + w_hat*std::sin(theta) + w_hat*w_hat*(1-std::cos(theta));
     
     return expM;
 }
@@ -141,7 +141,6 @@ Eigen::Matrix4d kinematics::expTwist(const Vector6d& xi, const double theta)
     Eigen::Vector3d w = xi.segment<3>(3);
     
     Eigen::Matrix4d expT = Eigen::Matrix4d::Identity();
-    
     
     if (w(0)==0 && w(1)==0 && w(2)==0)
     {
