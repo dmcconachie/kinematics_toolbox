@@ -239,7 +239,7 @@ Vector6d kinematics::calculateError(const Eigen::Matrix4d& g_current,
 
     Eigen::Matrix4d g_diff = g_current.inverse()*g_desired;
 
-    std::cerr << "g_diff:\n" << g_diff << std::endl;
+//    std::cerr << "g_diff:\n" << g_diff << std::endl;
 
     xi = twistUnhat(g_diff.log());
 
