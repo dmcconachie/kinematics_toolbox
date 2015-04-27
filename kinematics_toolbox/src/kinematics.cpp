@@ -55,6 +55,20 @@ Vector6d kinematics::createTwist(const Eigen::Vector3d& omega, const Eigen::Vect
     return xi;
 }
 
+std::vector<Vector6d> kinematics::createTwist(const std::vector<Eigen::Vector3d>& omega,
+                                              const std::vector<Eigen::Vector3d>& q)
+{
+    std::vector<Vector6d> xi(omega.size());
+
+    for (unsigned int i = 0; i < omega.size(); i++)
+    {
+        xi[i] = createTwist(omega[i], q[i]);
+    }
+
+    return xi;
+}
+
+
 std::vector<Vector6d> kinematics::calculateTwists(const Eigen::Matrix4d& g_base,
                                                   const std::vector<Eigen::Vector3d>& omega0,
                                                   const std::vector<Eigen::Vector3d>& q0)
