@@ -15,6 +15,8 @@ Eigen::Matrix3d skew(const Eigen::Vector3d& w);
 Eigen::Vector3d unskew(const Eigen::Matrix3d& w_hat);
 
 Vector6d createTwist(const Eigen::Vector3d& omega, const Eigen::Vector3d& q);
+std::vector<Vector6d> createTwist(const std::vector<Eigen::Vector3d>& omega,
+                                  const std::vector<Eigen::Vector3d>& q);
 std::vector<Vector6d> calculateTwists(const Eigen::Matrix4d& g_base,
                                       const std::vector<Eigen::Vector3d>& omega0,
                                       const std::vector<Eigen::Vector3d>& q0);
