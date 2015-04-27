@@ -27,9 +27,12 @@ Eigen::Matrix4d expTwist(const Vector6d& xi, const double theta);
 Eigen::Matrix4d expTwist(const std::vector<Vector6d>& xi,
                          const std::vector<double>& theta);
 
+Matrix6Xd spatialJacobian(const std::vector<Vector6d>& xi,
+                          const std::vector<double>& theta,
+                          const Eigen::Matrix4d& g_theta);
 Matrix6Xd bodyJacobian(const std::vector<Vector6d>& xi,
                        const std::vector<double>& theta,
-                       const Eigen::Matrix4d& g_theta);
+                       const Eigen::Matrix4d& g_0);
 
 Vector6d calculateError(const Eigen::Matrix4d& g_current,
                         const Eigen::Matrix4d& g_desired);

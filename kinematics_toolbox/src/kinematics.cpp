@@ -192,42 +192,56 @@ Eigen::Matrix4d kinematics::expTwist(const std::vector<Vector6d>& xi,
 // Geometric Jacobians
 ////////////////////////////////////////////////////////////////////////////////
 
-Matrix6Xd kinematics::bodyJacobian(const std::vector<Vector6d>& xi,
-                                   const std::vector<double>& theta,
-                                   const Eigen::Matrix4d& g_theta)
+Matrix6Xd kinematics::spatialJacobian(const std::vector<Vector6d>& xi,
+                                      const std::vector<double>& theta,
+                                      const Eigen::Matrix4d& g_theta)
 {
     int numTheta = theta.size();
     Matrix6Xd J_s(6,numTheta);
-    Matrix6Xd J_b(6,numTheta);
+    //Matrix6Xd J_b(6,numTheta);
     
     Eigen::Matrix4d g = Eigen::Matrix4d::Identity();
-
-    Vector6d lastTwist;
-    Vector6d currentTwist;
     Eigen::Matrix4d expT;
     
     for(int i = 0; i < numTheta; i++)
     {
         if (i == 0)
         {
-            currentTwist = xi[i];
-            J_s.block<6,1>(0,i) = currentTwist;
+            J_s.block<6,1>(0,i) = xi[i];
         }
         else
         {
-            lastTwist = currentTwist;
-            currentTwist = xi[i];
-            expT = expTwist(lastTwist, theta[i-1]);
+            expT = expTwist(xi[i-1], theta[i-1]);
             g = g * expT;
-            J_s.block<6,1>(0,i) = adj(g)*currentTwist;
+            J_s.block<6,1>(0,i) = adj(g)*xi[i];
         }
     }
     
-    J_b = adj(g_theta.inverse()) * J_s;
+    //J_b = adj(g_theta.inverse()) * J_s;
+
+    return J_s;
+}
+
+Matrix6Xd kinematics::bodyJacobian(const std::vector<Vector6d>& xi,
+                                   const std::vector<double>& theta,
+                                   const Eigen::Matrix4d& g_0)
+{
+    int numTheta = theta.size();
+    Matrix6Xd J_b(6,numTheta);
+    
+    Eigen::Matrix4d g = g_0;
+
+    Eigen::Matrix4d expT;
+    
+    for(int i = numTheta; i > 0; i--)
+    {
+        expT = expTwist(xi[i-1], theta[i-1]);
+        g = expT * g;
+        J_b.block<6,1>(0,i-1) = adj(g).inverse() * xi[i-1];
+    }
 
     return J_b;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // Other
 ////////////////////////////////////////////////////////////////////////////////
