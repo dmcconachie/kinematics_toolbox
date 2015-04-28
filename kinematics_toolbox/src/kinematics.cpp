@@ -247,11 +247,11 @@ Matrix6Xd kinematics::bodyJacobian(const std::vector<Vector6d>& xi,
 
     Eigen::Matrix4d expT;
     
-    for(int i = numTheta; i > 0; i--)
+    for(int i = numTheta-1; i >= 0; i--)
     {
-        expT = expTwist(xi[i-1], theta[i-1]);
+        expT = expTwist(xi[i], theta[i]);
         g = expT * g;
-        J_b.block<6,1>(0,i-1) = adj(g).inverse() * xi[i-1];
+        J_b.block<6,1>(0,i) = adj(g.inverse()) * xi[i];
     }
 
     return J_b;
