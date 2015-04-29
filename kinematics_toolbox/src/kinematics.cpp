@@ -46,6 +46,27 @@ Eigen::Matrix4d kinematics::translate(const Eigen::Vector3d& p)
     return T;
 }
 
+Eigen::Matrix4d kinematics::transX(const double x)
+{
+    Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
+    T(0,3) = x;
+    return T;
+}
+
+Eigen::Matrix4d kinematics::transY(const double y)
+{
+    Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
+    T(1,3) = y;
+    return T;
+}
+
+Eigen::Matrix4d kinematics::transZ(const double z)
+{
+    Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
+    T(2,3) = z;
+    return T;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Skew and Unskew for 3x3 matrices
 ////////////////////////////////////////////////////////////////////////////////
