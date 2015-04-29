@@ -19,6 +19,9 @@ Eigen::Matrix4d rotX(const double theta);
 Eigen::Matrix4d rotY(const double theta);
 Eigen::Matrix4d rotZ(const double theta);
 Eigen::Matrix4d translate(const Eigen::Vector3d& p);
+Eigen::Matrix4d transX(const double x);
+Eigen::Matrix4d transY(const double y);
+Eigen::Matrix4d transZ(const double z);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Skew and Unskew for 3x3 matrices
