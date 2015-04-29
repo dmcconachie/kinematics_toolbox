@@ -14,7 +14,7 @@ Eigen::Matrix4d kinematics::rotX(const double theta)
     Eigen::Matrix4d R;
     R << 1,                0,                0, 0,
          0,  std::cos(theta), -std::sin(theta), 0,
-         0,  std::cos(theta),  std::cos(theta), 0,
+         0,  std::sin(theta),  std::cos(theta), 0,
          0,                0,                0, 1;
     return R;
 }
