@@ -11,6 +11,11 @@ typedef Eigen::Matrix< double, 6, 1 > Vector6d;
 typedef Eigen::Matrix< double, 6, 6 > Matrix6d;
 typedef Eigen::Matrix< double, 6, Eigen::Dynamic > Matrix6Xd;
 
+typedef struct {
+  Vector6d vel;
+  bool valid;
+} Velocity6d;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Basic Transforms
 ////////////////////////////////////////////////////////////////////////////////
