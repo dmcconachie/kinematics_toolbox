@@ -4,8 +4,7 @@ project(kinematics_toolbox)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-)
+find_package(catkin REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
