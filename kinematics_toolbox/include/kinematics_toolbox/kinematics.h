@@ -54,7 +54,7 @@ Vector6d twistUnhat( const Eigen::Matrix4d& xi_hat );
 
 Matrix6d adj( const Eigen::Matrix4d& g );
 Eigen::Matrix3d expmExact( const Eigen::Matrix3d& w_hat, const double theta );
-Eigen::Matrix4d expTwist( const Vector6d& xi, const double theta );
+Eigen::Matrix4d expTwist( const Vector6d& xi, double theta );
 Eigen::Matrix4d expTwist( const std::vector< Vector6d >& xi,
                           const std::vector< double >& theta );
 
