@@ -1,15 +1,18 @@
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 
-#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <vector>
 
 namespace kinematics
 {
 
 typedef Eigen::Matrix< double, 6, 1 > Vector6d;
+typedef Eigen::Matrix< double, 7, 1 > Vector7d;
 typedef Eigen::Matrix< double, 6, 6 > Matrix6d;
+typedef Eigen::Matrix< double, 7, 7 > Matrix7d;
 typedef Eigen::Matrix< double, 6, Eigen::Dynamic > Matrix6Xd;
+typedef Eigen::Matrix< double, 7, Eigen::Dynamic > Matrix7Xd;
 
 typedef struct {
   Vector6d vel;
@@ -59,7 +62,7 @@ Eigen::Matrix4d expTwist( const std::vector< Vector6d >& xi,
                           const std::vector< double >& theta );
 
 ////////////////////////////////////////////////////////////////////////////////
-// Geometric Jacobians
+// Jacobians
 ////////////////////////////////////////////////////////////////////////////////
 
 Matrix6Xd spatialJacobian( const std::vector< Vector6d >& xi,
@@ -69,12 +72,26 @@ Matrix6Xd bodyJacobian( const std::vector< Vector6d >& xi,
                         const std::vector< double >& theta,
                         const Eigen::Matrix4d& g_zero );
 
+Eigen::Matrix< double, 1, Eigen::Dynamic > calculateJJointLimits(
+                            const std::vector< double >& theta,
+                            const double joint_limit );
+
+Eigen::MatrixXd dampedPinv( const kinematics::Matrix7Xd& J,
+                            const std::vector< double >& theta,
+                            const double joint_limit,
+                            const double limit_threshold,
+                            const double manipubility_threshold,
+                            const double damping_ratio );
+
 ////////////////////////////////////////////////////////////////////////////////
 // Other
 ////////////////////////////////////////////////////////////////////////////////
 
 Vector6d calculateError( const Eigen::Matrix4d& g_current,
                          const Eigen::Matrix4d& g_desired );
+
+double jointLimitError( const std::vector< double >& theta,
+                        const double joint_limit );
 
 };
 

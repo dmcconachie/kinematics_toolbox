@@ -279,7 +279,7 @@ Eigen::Matrix4d kinematics::expTwist( const std::vector< Vector6d >& xi,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Geometric Jacobians
+// Jacobians
 ////////////////////////////////////////////////////////////////////////////////
 
 Matrix6Xd kinematics::spatialJacobian( const std::vector< Vector6d >& xi,
@@ -330,6 +330,76 @@ Matrix6Xd kinematics::bodyJacobian( const std::vector< Vector6d >& xi,
     return J_b;
 }
 
+Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
+                                        const std::vector< double >& theta,
+                                        const double joint_limit )
+{
+    unsigned int num_joints = theta.size();
+    
+    Eigen::Matrix< double, 1, Eigen::Dynamic > J( 1, num_joints );
+
+    // finite difference value
+    double eps = 1e-6;
+
+    // find the error before perturbing by eps
+    double error = jointLimitError( theta, joint_limit );
+
+    // perturb each joint by eps and see how error changes
+    
+    for ( unsigned int i = 0; i < num_joints; i++ )
+    {
+        std::vector< double > theta_tweak = theta;
+        theta_tweak[i] += eps;
+        double error_tweak = jointLimitError( theta_tweak, joint_limit );
+        J(0, i) = ( error_tweak - error ) / eps;
+    }
+
+    return J;
+}
+
+Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix7Xd& J,
+                                        const std::vector< double >& theta,
+                                        const double theta_limit,
+                                        const double limit_threshold,
+                                        const double manipubility_threshold, 
+                                        const double damping_ratio )
+{
+    unsigned int num_joints = theta.size();
+
+    kinematics::Matrix7d JJtranspose = J * J.transpose();
+    kinematics::Matrix7d W_x = kinematics::Matrix7d::Identity();
+    Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
+    
+    // Determine least-squares damping and weights, from:
+    // "Robust Inverse Kinematics Using Damped Least Squares
+    // with Dynamic Weighting"  NASA 1994 
+    for( unsigned int i = 1; i < num_joints; i++ )
+    {
+        double theta_to_limit = theta_limit - std::abs( theta[i] );
+        
+        if (  theta_to_limit < limit_threshold )
+        {
+            W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
+        } 
+    } 
+    
+    kinematics::Matrix7Xd J_w = W_x * J * W_q;
+    
+    // find the damping ratio
+    // Based on Manipulability, in 'Prior Work' of above paper
+    double manipubility = JJtranspose.determinant();
+    double damping = 0;
+    if ( manipubility < manipubility_threshold )
+    {
+        damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
+    }
+    
+    kinematics::Matrix7d tmp = JJtranspose + damping * kinematics::Matrix7d::Identity();
+    Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
+    
+    return W_q * J_inv * W_x;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Other
 ////////////////////////////////////////////////////////////////////////////////
@@ -344,4 +414,19 @@ Vector6d kinematics::calculateError( const Eigen::Matrix4d& g_current,
     xi = twistUnhat( g_diff.log() );
 
     return xi;
+}
+
+double kinematics::jointLimitError( const std::vector< double >& theta,
+                                    const double joint_limit )
+{
+    //TODO: get rid of magic number
+    double error_scale = 0.01;
+    double error = 0;
+
+    for ( unsigned int i = 0; i < theta.size(); i++)
+    {
+        error += joint_limit / std::pow( std::abs(theta[i]) - joint_limit, 4);
+    }
+
+    return error_scale * error;
 }
