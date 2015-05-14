@@ -28,6 +28,8 @@ catkin_package(
   DEPENDS           Eigen3
 )
 
+add_definitions( "-Wall -Wextra -std=c++11 -O2" )
+
 ###########
 ## Build ##
 ###########

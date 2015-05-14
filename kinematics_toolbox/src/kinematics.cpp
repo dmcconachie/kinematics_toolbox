@@ -283,8 +283,7 @@ Eigen::Matrix4d kinematics::expTwist( const std::vector< Vector6d >& xi,
 ////////////////////////////////////////////////////////////////////////////////
 
 Matrix6Xd kinematics::spatialJacobian( const std::vector< Vector6d >& xi,
-                                       const std::vector< double >& theta,
-                                       const Eigen::Matrix4d& g_theta )
+                                       const std::vector< double >& theta )
 {
     int num_theta = theta.size();
     Matrix6Xd J_s( 6, num_theta );
