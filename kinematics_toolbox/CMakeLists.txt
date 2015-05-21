@@ -1,17 +1,11 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(kinematics_toolbox)
+cmake_minimum_required( VERSION 2.8.3 )
+project( kinematics_toolbox )
 
 ## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package( catkin REQUIRED )
 
-find_package(Eigen3 REQUIRED)
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+## System dependencies are found with CMake's conventions
+find_package( Eigen3 REQUIRED )
 
 ###################################
 ## catkin specific configuration ##
@@ -23,12 +17,10 @@ find_package(Eigen3 REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS      include
-  LIBRARIES         kinematics_toolbox
-  DEPENDS           Eigen3
+  INCLUDE_DIRS    include
+  LIBRARIES       ${PROJECT_NAME}
+  DEPENDS         EIGEN3
 )
-
-add_definitions( "-Wall -Wextra -std=c++11 -O2" )
 
 ###########
 ## Build ##
@@ -36,65 +28,35 @@ add_definitions( "-Wall -Wextra -std=c++11 -O2" )
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories( include )
 include_directories(
   ${EIGEN3_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
 )
 
+add_definitions( "-Wall -Wextra -std=c++11 -O2" )
 
-## Declare a cpp library
-add_library(kinematics_toolbox
+#######################
+## Build - Libraries ##
+#######################
+
+add_library( ${PROJECT_NAME}
   src/kinematics.cpp
 )
-target_link_libraries(kinematics_toolbox
+target_link_libraries( ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
+
+#########################
+## Build - Executables ##
+#########################
+
 
 #############
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables and/or libraries for installation
-# install(TARGETS kinematics_toolbox kinematics_toolbox_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
 
 #############
 ## Testing ##
 #############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_kinematics_toolbox.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
