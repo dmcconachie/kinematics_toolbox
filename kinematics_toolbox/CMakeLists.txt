@@ -18,6 +18,7 @@ find_package( Eigen3 REQUIRED )
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS    include
+                  ${EIGEN3_INCLUDE_DIR} # TODO: why is this needed here with EIGEN3 as a depend later?
   LIBRARIES       ${PROJECT_NAME}
   DEPENDS         EIGEN3
 )
