@@ -356,7 +356,7 @@ Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
     return J;
 }
 
-Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix7Xd& J,
+Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix6Xd& J,
                                         const std::vector< double >& theta,
                                         const double theta_limit,
                                         const double limit_threshold,
@@ -365,8 +365,8 @@ Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix7Xd& J,
 {
     unsigned int num_joints = theta.size();
 
-    kinematics::Matrix7d JJtranspose = J * J.transpose();
-    kinematics::Matrix7d W_x = kinematics::Matrix7d::Identity();
+    kinematics::Matrix6d JJtranspose = J * J.transpose();
+    kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
     Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
     
     // Determine least-squares damping and weights, from:
@@ -382,7 +382,7 @@ Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix7Xd& J,
         } 
     } 
     
-    kinematics::Matrix7Xd J_w = W_x * J * W_q;
+    kinematics::Matrix6Xd J_w = W_x * J * W_q;
     
     // find the damping ratio
     // Based on Manipulability, in 'Prior Work' of above paper
@@ -393,7 +393,7 @@ Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix7Xd& J,
         damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
     }
     
-    kinematics::Matrix7d tmp = JJtranspose + damping * kinematics::Matrix7d::Identity();
+    kinematics::Matrix6d tmp = JJtranspose + damping * kinematics::Matrix6d::Identity();
     Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
     
     return W_q * J_inv * W_x;

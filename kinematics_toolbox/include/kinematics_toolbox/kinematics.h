@@ -76,7 +76,7 @@ namespace kinematics
                               const std::vector< double >& theta,
                               const double joint_limit );
 
-  Eigen::MatrixXd dampedPinv( const kinematics::Matrix7Xd& J,
+  Eigen::MatrixXd dampedPinv( const kinematics::Matrix6Xd& J,
                               const std::vector< double >& theta,
                               const double joint_limit,
                               const double limit_threshold,
