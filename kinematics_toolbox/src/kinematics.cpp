@@ -1,8 +1,5 @@
 #include "kinematics_toolbox/kinematics.h"
 
-#include <cmath>
-#include <unsupported/Eigen/MatrixFunctions>
-
 using namespace kinematics;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -356,12 +353,12 @@ Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
     return J;
 }
 
-Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix6Xd& J,
-                                        const std::vector< double >& theta,
-                                        const double theta_limit,
-                                        const double limit_threshold,
-                                        const double manipubility_threshold, 
-                                        const double damping_ratio )
+Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
+                                           const std::vector< double >& theta,
+                                           const double theta_limit,
+                                           const double limit_threshold,
+                                           const double manipubility_threshold, 
+                                           const double damping_ratio )
 {
     unsigned int num_joints = theta.size();
 
@@ -394,6 +391,50 @@ Eigen::MatrixXd kinematics::dampedPinv( const kinematics::Matrix6Xd& J,
     }
     
     kinematics::Matrix6d tmp = JJtranspose + damping * kinematics::Matrix6d::Identity();
+    Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
+    
+    return W_q * J_inv * W_x;
+}
+
+Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
+                                          const std::vector< double >& theta,
+                                          const double theta_limit,
+                                          const double limit_threshold,
+                                          const double manipubility_threshold, 
+                                          const double damping_ratio )
+{
+    unsigned int num_joints = theta.size();
+    unsigned int num_velocities = J.rows();
+
+    Eigen::MatrixXd JJtranspose = J * J.transpose();
+    Eigen::MatrixXd W_x = Eigen::MatrixXd::Identity( num_velocities, num_velocities );
+    Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
+    
+    // Determine least-squares damping and weights, from:
+    // "Robust Inverse Kinematics Using Damped Least Squares
+    // with Dynamic Weighting"  NASA 1994 
+    for( unsigned int i = 1; i < num_joints; i++ )
+    {
+        double theta_to_limit = theta_limit - std::abs( theta[i] );
+        
+        if (  theta_to_limit < limit_threshold )
+        {
+            W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
+        } 
+    } 
+    
+    Eigen::MatrixXd J_w = W_x * J * W_q;
+    
+    // find the damping ratio
+    // Based on Manipulability, in 'Prior Work' of above paper
+    double manipubility = JJtranspose.determinant();
+    double damping = 0;
+    if ( manipubility < manipubility_threshold )
+    {
+        damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
+    }
+    
+    Eigen::MatrixXd tmp = JJtranspose + damping * Eigen::MatrixXd::Identity( num_velocities, num_velocities );
     Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
     
     return W_q * J_inv * W_x;

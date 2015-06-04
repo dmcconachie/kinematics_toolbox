@@ -1,8 +1,10 @@
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 
-#include <Eigen/Dense>
+#include <cmath>
 #include <vector>
+#include <Eigen/Dense>
+#include <unsupported/Eigen/MatrixFunctions>
 
 namespace kinematics
 {
@@ -76,12 +78,19 @@ namespace kinematics
                               const std::vector< double >& theta,
                               const double joint_limit );
 
-  Eigen::MatrixXd dampedPinv( const kinematics::Matrix6Xd& J,
-                              const std::vector< double >& theta,
-                              const double joint_limit,
-                              const double limit_threshold,
-                              const double manipubility_threshold,
-                              const double damping_ratio );
+  Eigen::MatrixXd dampedPinv6Xd( const kinematics::Matrix6Xd& J,
+                                 const std::vector< double >& theta,
+                                 const double joint_limit,
+                                 const double limit_threshold,
+                                 const double manipubility_threshold,
+                                 const double damping_ratio );
+
+  Eigen::MatrixXd dampedPinvXd( const Eigen::MatrixXd& J,
+                                const std::vector< double >& theta,
+                                const double joint_limit,
+                                const double limit_threshold,
+                                const double manipubility_threshold,
+                                const double damping_ratio );
 
   ////////////////////////////////////////////////////////////////////////////////
   // Other
