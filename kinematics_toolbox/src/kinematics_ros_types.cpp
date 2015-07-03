@@ -29,6 +29,17 @@ geometry_msgs::Twist kinematics_ros_types::calculateError(
   diff.linear.z = 0;
   diff.angular.x = 0;
   diff.angular.y = 0;
-  diff.angular.z = current.theta - desired.theta;
+  diff.angular.z = desired.theta - current.theta;
+
+  // do some modulus math on theta
+  while ( diff.angular.z > M_PI )
+  {
+    diff.angular.z -= 2 * M_PI;
+  }
+  while ( diff.angular.z < -M_PI )
+  {
+    diff.angular.z += 2 * M_PI;
+  }
+
   return diff;
 }

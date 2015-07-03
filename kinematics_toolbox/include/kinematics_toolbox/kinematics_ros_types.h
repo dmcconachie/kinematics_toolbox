@@ -133,15 +133,15 @@ namespace kinematics_ros_types
     ( geometry_msgs::Twist l, const double& r )
   {
     l.linear *= r;
-    l.linear *= r;
+    l.angular *= r;
     return l;
   }
 
   inline geometry_msgs::Twist operator/ 
     ( geometry_msgs::Twist l, const double& r )
   {
-    l.linear *= r;
-    l.linear *= r;
+    l.linear /= r;
+    l.angular /= r;
     return l;
   }
 
@@ -149,16 +149,32 @@ namespace kinematics_ros_types
     ( geometry_msgs::Twist &l, const double& r )
   {
     l.linear *= r;
-    l.linear *= r;
+    l.angular *= r;
     return l;
   }
 
   inline geometry_msgs::Twist operator/= 
     ( geometry_msgs::Twist &l, const double& r )
   {
-    l.linear *= r;
-    l.linear *= r;
+    l.linear /= r;
+    l.angular /= r;
     return l;
+  }
+
+  inline geometry_msgs::Twist operator* 
+    ( const double& l, geometry_msgs::Twist r )
+  {
+    r.linear *= l;
+    r.angular *= l;
+    return r;
+  }
+
+  inline geometry_msgs::Twist operator/ 
+    ( const double& l, geometry_msgs::Twist r )
+  {
+    r.linear *= l;
+    r.angular /= l;
+    return r;
   }
 
 
