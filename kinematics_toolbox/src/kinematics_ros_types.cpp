@@ -24,7 +24,7 @@ geometry_msgs::Twist kinematics_ros_types::calculateError(
     + ( desired.y - current.y ) * sin( current.theta );
 
   diff.linear.y = ( desired.y - current.y ) * cos( current.theta )
-    - ( desired.y - current.y ) * sin( current.theta );
+    - ( desired.x - current.x ) * sin( current.theta );
 
   diff.linear.z = 0;
   diff.angular.x = 0;

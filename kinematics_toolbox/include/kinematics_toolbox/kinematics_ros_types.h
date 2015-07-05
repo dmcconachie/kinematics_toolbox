@@ -89,7 +89,7 @@ namespace kinematics_ros_types
 
   inline double norm( const geometry_msgs::Vector3& vec )
   {
-    return sqrt( vec.x * vec.x + vec.y * vec.y + vec.z * vec.z );
+    return sqrt( ( vec.x * vec.x ) + ( vec.y * vec.y ) + ( vec.z * vec.z ) );
   }
 
   //////////////////////////////////////////////////////////////////////////////
