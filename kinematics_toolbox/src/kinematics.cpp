@@ -75,7 +75,7 @@ Eigen::Matrix3d kinematics::skew( const Eigen::Vector3d& w )
     w_hat <<       0, -w( 2 ),  w( 1 ),
               w( 2 ),       0, -w( 0 ),
              -w( 1 ),  w( 0 ),       0;
-    
+
     return w_hat;
 }
 
@@ -84,7 +84,7 @@ Eigen::Vector3d kinematics::unskew( const Eigen::Matrix3d& w_hat )
     Eigen::Vector3d w;
     Eigen::Matrix3d w_hat_sym;
     w_hat_sym = ( w_hat - w_hat.transpose() )/2;
-    
+
     w << w_hat_sym( 2, 1 ), w_hat_sym( 0, 2 ), w_hat_sym( 1, 0 );
 
     return w;
@@ -109,7 +109,7 @@ Vector6d kinematics::createTwist( const Eigen::Vector3d& omega, const Eigen::Vec
         xi.segment< 3 >( 0 ) = -omega.cross( q );
         xi.segment< 3 >( 3 ) = omega;
     }
-    
+
     return xi;
 }
 
@@ -158,10 +158,10 @@ Eigen::Matrix4d kinematics::twistHat( const Vector6d& xi )
     Eigen::Vector3d v = xi.segment< 3 >( 0 );
     Eigen::Vector3d w = xi.segment< 3 >( 3 );
     Eigen::Matrix3d w_hat = skew( w );
-    
+
     xi_hat.block< 3, 3>( 0, 0 ) = w_hat;
     xi_hat.block< 3, 1>( 0, 3 ) = v;
-    
+
     return xi_hat;
 }
 
@@ -172,10 +172,10 @@ Vector6d kinematics::twistUnhat( const Eigen::Matrix4d& xi_hat )
     Eigen::Vector3d v = xi_hat.block< 3, 1>( 0, 3 );
     Eigen::Matrix3d w_hat = xi_hat.block< 3, 3>( 0, 0 );
     Eigen::Vector3d w = unskew( w_hat );
-    
+
     xi.segment< 3 >( 0 ) = v;
     xi.segment< 3 >( 3 ) = w;
-    
+
     return xi;
 }
 
@@ -188,14 +188,14 @@ Matrix6d kinematics::adj( const Eigen::Matrix4d& g )
     Eigen::Matrix3d R = g.block< 3, 3>( 0, 0 );
     Eigen::Vector3d p = g.block< 3, 1>( 0, 3 );
     Eigen::Matrix3d p_hat = skew( p );
-    
+
     Matrix6d adj_g;
-    
+
     adj_g.block< 3, 3>( 0, 0 ) = R;
     adj_g.block< 3, 3>( 0, 3 ) = p_hat*R;
     adj_g.block< 3, 3>( 3, 0 ) = Eigen::Matrix3d::Zero( 3, 3 );
     adj_g.block< 3, 3>( 3, 3 ) = R;
-    
+
     return adj_g;
 }
 
@@ -204,14 +204,14 @@ Matrix6d kinematics::adj( const Eigen::Matrix4d& g )
     Eigen::Matrix3d R = g.block< 3, 3>( 0, 0 );
     Eigen::Vector3d p = g.block< 3, 1>( 0, 3 );
     Eigen::Matrix3d p_hat = skew( p );
-    
+
     Matrix6d adjinv_g;
-    
+
     adjinv_g.block< 3, 3 >( 0, 0 ) = R.transpose();
     adjinv_g.block< 3, 3 >( 0, 3 ) = -R.transpose()*p_hat;
     adjinv_g.block< 3, 3 >( 3, 0 ) = Eigen::Matrix3d::Zero( 3, 3 );
     adjinv_g.block< 3, 3 >( 3, 3 ) = R.transpose();
-    
+
     return adjinv_g;
 }*/
 
@@ -220,13 +220,13 @@ Eigen::Matrix3d kinematics::expmExact( const Eigen::Matrix3d& w_hat, const doubl
     Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
 
     // w_hat should be normalized before calling this function
-    assert( abs(unskew( w_hat ).norm() - 1) < 1e-10 );
-    
+    assert( std::abs(unskew( w_hat ).norm() - 1) < 1e-10 );
+
     Eigen::Matrix3d expM;
-    expM = eye3 
+    expM = eye3
            + w_hat * std::sin( theta )
            + w_hat * w_hat * ( 1 - std::cos( theta ) );
-    
+
     return expM;
 }
 
@@ -234,9 +234,9 @@ Eigen::Matrix4d kinematics::expTwist( const Vector6d& xi, double theta )
 {
     Eigen::Vector3d v = xi.segment< 3 >( 0 );
     Eigen::Vector3d w = xi.segment< 3 >( 3 );
-    
+
     Eigen::Matrix4d expT = Eigen::Matrix4d::Identity();
-    
+
     if ( w( 0 ) == 0 && w( 1 ) == 0 && w( 2 ) == 0 )
     {
         expT.block< 3, 1 >( 0, 3 ) = v*theta;
@@ -253,12 +253,12 @@ Eigen::Matrix4d kinematics::expTwist( const Vector6d& xi, double theta )
         Eigen::Matrix3d w_hat = skew( w );
         Eigen::Matrix3d exp_w_hat_theta = expmExact( w_hat, theta );
         Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
-        
+
         expT.block< 3, 3 >( 0, 0 ) = exp_w_hat_theta;
-        expT.block< 3, 1 >( 0, 3 ) = ( eye3 - exp_w_hat_theta ) * w.cross( v ) 
+        expT.block< 3, 1 >( 0, 3 ) = ( eye3 - exp_w_hat_theta ) * w.cross( v )
                                      + w * w.transpose() * v * theta;
     }
-    
+
     return expT;
 }
 
@@ -284,10 +284,10 @@ Matrix6Xd kinematics::spatialJacobian( const std::vector< Vector6d >& xi,
 {
     int num_theta = theta.size();
     Matrix6Xd J_s( 6, num_theta );
-    
+
     Eigen::Matrix4d g = Eigen::Matrix4d::Identity();
     Eigen::Matrix4d expT;
-    
+
     for( int i = 0; i < num_theta; i++ )
     {
         if ( i == 0 )
@@ -311,11 +311,11 @@ Matrix6Xd kinematics::bodyJacobian( const std::vector< Vector6d >& xi,
 {
     int num_theta = theta.size();
     Matrix6Xd J_b( 6, num_theta );
-    
+
     Eigen::Matrix4d g = g_zero;
 
     Eigen::Matrix4d expT;
-    
+
     for( int i = num_theta - 1; i >= 0; i-- )
     {
         expT = expTwist( xi[i], theta[i] );
@@ -331,7 +331,7 @@ Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
                                         const double joint_limit )
 {
     unsigned int num_joints = theta.size();
-    
+
     Eigen::Matrix< double, 1, Eigen::Dynamic > J( 1, num_joints );
 
     // finite difference value
@@ -341,7 +341,7 @@ Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
     double error = jointLimitError( theta, joint_limit );
 
     // perturb each joint by eps and see how error changes
-    
+
     for ( unsigned int i = 0; i < num_joints; i++ )
     {
         std::vector< double > theta_tweak = theta;
@@ -357,7 +357,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
                                            const std::vector< double >& theta,
                                            const double theta_limit,
                                            const double limit_threshold,
-                                           const double manipubility_threshold, 
+                                           const double manipubility_threshold,
                                            const double damping_ratio )
 {
     unsigned int num_joints = theta.size();
@@ -365,22 +365,22 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
     kinematics::Matrix6d JJtranspose = J * J.transpose();
     kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
     Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
-    
+
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
-    // with Dynamic Weighting"  NASA 1994 
+    // with Dynamic Weighting"  NASA 1994
     for( unsigned int i = 1; i < num_joints; i++ )
     {
         double theta_to_limit = theta_limit - std::abs( theta[i] );
-        
+
         if (  theta_to_limit < limit_threshold )
         {
             W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
-        } 
-    } 
-    
+        }
+    }
+
     kinematics::Matrix6Xd J_w = W_x * J * W_q;
-    
+
     // find the damping ratio
     // Based on Manipulability, in 'Prior Work' of above paper
     double manipubility = JJtranspose.determinant();
@@ -389,10 +389,10 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
     {
         damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
     }
-    
+
     kinematics::Matrix6d tmp = JJtranspose + damping * kinematics::Matrix6d::Identity();
     Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
-    
+
     return W_q * J_inv * W_x;
 }
 
@@ -400,7 +400,7 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
                                           const std::vector< double >& theta,
                                           const double theta_limit,
                                           const double limit_threshold,
-                                          const double manipubility_threshold, 
+                                          const double manipubility_threshold,
                                           const double damping_ratio )
 {
     unsigned int num_joints = theta.size();
@@ -409,22 +409,22 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
     Eigen::MatrixXd JJtranspose = J * J.transpose();
     Eigen::MatrixXd W_x = Eigen::MatrixXd::Identity( num_velocities, num_velocities );
     Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
-    
+
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
-    // with Dynamic Weighting"  NASA 1994 
+    // with Dynamic Weighting"  NASA 1994
     for( unsigned int i = 1; i < num_joints; i++ )
     {
         double theta_to_limit = theta_limit - std::abs( theta[i] );
-        
+
         if (  theta_to_limit < limit_threshold )
         {
             W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
-        } 
-    } 
-    
+        }
+    }
+
     Eigen::MatrixXd J_w = W_x * J * W_q;
-    
+
     // find the damping ratio
     // Based on Manipulability, in 'Prior Work' of above paper
     double manipubility = JJtranspose.determinant();
@@ -433,10 +433,10 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
     {
         damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
     }
-    
+
     Eigen::MatrixXd tmp = JJtranspose + damping * Eigen::MatrixXd::Identity( num_velocities, num_velocities );
     Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
-    
+
     return W_q * J_inv * W_x;
 }
 

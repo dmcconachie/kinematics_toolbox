@@ -27,13 +27,12 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-include_directories( include )
-include_directories(
+include_directories( include SYSTEM
   ${EIGEN3_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
 )
 
-add_definitions( "-Wall -Wextra -std=c++11 -O2" )
+add_definitions( "-Wall -Wextra -Wpedantic -std=c++0x -O3" )
 
 #######################
 ## Build - Libraries ##
