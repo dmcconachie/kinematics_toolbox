@@ -118,7 +118,7 @@ std::vector<Vector6d> kinematics::createTwist( const std::vector< Eigen::Vector3
 {
     std::vector<Vector6d> xi( omega.size() );
 
-    for ( unsigned int i = 0; i < omega.size(); i++ )
+    for ( size_t i = 0; i < omega.size(); i++ )
     {
         xi[i] = createTwist( omega[i], q[i] );
     }
@@ -134,7 +134,7 @@ std::vector<Vector6d> kinematics::calculateTwists( const Eigen::Matrix4d& g_base
     // TODO: is this the same thing as adj( g_base )*twist?
     std::vector<Vector6d> xi( q0.size() );
 
-    for ( unsigned int i = 0; i < q0.size(); i++ )
+    for ( size_t i = 0; i < q0.size(); i++ )
     {
         Eigen::Vector4d omega;
         Eigen::Vector4d q;
@@ -267,7 +267,7 @@ Eigen::Matrix4d kinematics::expTwist( const std::vector< Vector6d >& xi,
 {
     Eigen::Matrix4d g = Eigen::Matrix4d::Identity();
 
-    for ( unsigned int i = 0; i < theta.size(); i++ )
+    for ( size_t i = 0; i < theta.size(); i++ )
     {
       g = g * expTwist( xi[i], theta[i] );
     }
@@ -326,33 +326,6 @@ Matrix6Xd kinematics::bodyJacobian( const std::vector< Vector6d >& xi,
     return J_b;
 }
 
-Eigen::Matrix< double, 1, Eigen::Dynamic > kinematics::calculateJJointLimits(
-                                        const std::vector< double >& theta,
-                                        const double joint_limit )
-{
-    unsigned int num_joints = theta.size();
-
-    Eigen::Matrix< double, 1, Eigen::Dynamic > J( 1, num_joints );
-
-    // finite difference value
-    double eps = 1e-6;
-
-    // find the error before perturbing by eps
-    double error = jointLimitError( theta, joint_limit );
-
-    // perturb each joint by eps and see how error changes
-
-    for ( unsigned int i = 0; i < num_joints; i++ )
-    {
-        std::vector< double > theta_tweak = theta;
-        theta_tweak[i] += eps;
-        double error_tweak = jointLimitError( theta_tweak, joint_limit );
-        J(0, i) = ( error_tweak - error ) / eps;
-    }
-
-    return J;
-}
-
 Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
                                            const std::vector< double >& theta,
                                            const double theta_limit,
@@ -360,7 +333,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
                                            const double manipubility_threshold,
                                            const double damping_ratio )
 {
-    unsigned int num_joints = theta.size();
+    size_t num_joints = theta.size();
 
     kinematics::Matrix6d JJtranspose = J * J.transpose();
     kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
@@ -369,7 +342,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
     // with Dynamic Weighting"  NASA 1994
-    for( unsigned int i = 1; i < num_joints; i++ )
+    for( size_t i = 1; i < num_joints; i++ )
     {
         double theta_to_limit = theta_limit - std::abs( theta[i] );
 
@@ -403,8 +376,8 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
                                           const double manipubility_threshold,
                                           const double damping_ratio )
 {
-    unsigned int num_joints = theta.size();
-    unsigned int num_velocities = J.rows();
+    size_t num_joints = theta.size();
+    size_t num_velocities = J.rows();
 
     Eigen::MatrixXd JJtranspose = J * J.transpose();
     Eigen::MatrixXd W_x = Eigen::MatrixXd::Identity( num_velocities, num_velocities );
@@ -413,7 +386,7 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
     // with Dynamic Weighting"  NASA 1994
-    for( unsigned int i = 1; i < num_joints; i++ )
+    for( size_t i = 1; i < num_joints; i++ )
     {
         double theta_to_limit = theta_limit - std::abs( theta[i] );
 
@@ -456,17 +429,28 @@ Vector6d kinematics::calculateError( const Eigen::Matrix4d& g_current,
     return xi;
 }
 
-double kinematics::jointLimitError( const std::vector< double >& theta,
-                                    const double joint_limit )
+Vector6d kinematics::calculateVelocity( const Eigen::Affine3d& g_current,
+                                        const Eigen::Affine3d& g_next )
 {
-    //TODO: get rid of magic number
-    double error_scale = 0.01;
-    double error = 0;
+    Vector6d xi;
 
-    for ( unsigned int i = 0; i < theta.size(); i++)
+    Eigen::Affine3d g_diff = g_current.inverse() * g_next;
+
+    xi = twistUnhat( g_diff.matrix().log() );
+
+    return xi;
+}
+
+VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajectory )
+{
+    assert( g_trajectory.size() >= 2 );
+
+    VectorVector6d xi( g_trajectory.size() - 1 );
+
+    for ( size_t i = 0; i < xi.size() - 1 ; i++ )
     {
-        error += joint_limit / std::pow( std::abs(theta[i]) - joint_limit, 4);
+        xi[i] = calculateVelocity( g_trajectory[i], g_trajectory[i + 1] );
     }
 
-    return error_scale * error;
+    return xi;
 }

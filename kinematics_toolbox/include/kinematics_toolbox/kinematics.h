@@ -8,13 +8,24 @@
 
 namespace kinematics
 {
-
   typedef Eigen::Matrix< double, 6, 1 > Vector6d;
-  typedef Eigen::Matrix< double, 7, 1 > Vector7d;
   typedef Eigen::Matrix< double, 6, 6 > Matrix6d;
-  typedef Eigen::Matrix< double, 7, 7 > Matrix7d;
   typedef Eigen::Matrix< double, 6, Eigen::Dynamic > Matrix6Xd;
-  typedef Eigen::Matrix< double, 7, Eigen::Dynamic > Matrix7Xd;
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Typedefs for aligned STL containers using Eigen types
+  ////////////////////////////////////////////////////////////////////////////
+
+  typedef std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> VectorVector3f;
+  typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> VectorVector3d;
+  typedef std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> VectorVector4f;
+  typedef std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>> VectorVector4d;
+  typedef std::vector<Vector6d, Eigen::aligned_allocator<Eigen::Vector4d>> VectorVector6d;
+
+  typedef std::vector<Eigen::Quaternionf, Eigen::aligned_allocator<Eigen::Quaternionf>> VectorQuaternionf;
+  typedef std::vector<Eigen::Quaterniond, Eigen::aligned_allocator<Eigen::Quaterniond>> VectorQuaterniond;
+  typedef std::vector<Eigen::Affine3f, Eigen::aligned_allocator<Eigen::Affine3f>> VectorAffine3f;
+  typedef std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d>> VectorAffine3d;
 
   typedef struct
   {
@@ -74,10 +85,6 @@ namespace kinematics
                           const std::vector< double >& theta,
                           const Eigen::Matrix4d& g_zero );
 
-  Eigen::Matrix< double, 1, Eigen::Dynamic > calculateJJointLimits(
-                              const std::vector< double >& theta,
-                              const double joint_limit );
-
   Eigen::MatrixXd dampedPinv6Xd( const kinematics::Matrix6Xd& J,
                                  const std::vector< double >& theta,
                                  const double joint_limit,
@@ -96,11 +103,13 @@ namespace kinematics
   // Other
   ////////////////////////////////////////////////////////////////////////////////
 
+  Vector6d calculateVelocity( const Eigen::Affine3d& g_current,
+                              const Eigen::Affine3d& g_next );
+
+  VectorVector6d calculateVelocities( const VectorAffine3d& g_trajectory );
+
   Vector6d calculateError( const Eigen::Matrix4d& g_current,
                            const Eigen::Matrix4d& g_desired );
-
-  double jointLimitError( const std::vector< double >& theta,
-                          const double joint_limit );
-};
+}
 
 #endif
