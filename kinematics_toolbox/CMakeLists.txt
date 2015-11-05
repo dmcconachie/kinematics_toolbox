@@ -39,6 +39,7 @@ add_definitions( "-Wall -Wextra -Wpedantic -std=c++0x -O3" )
 #######################
 
 add_library( ${PROJECT_NAME}
+  include/${PROJECT_NAME}/kinematics.h
   src/kinematics.cpp
 )
 target_link_libraries( ${PROJECT_NAME}
@@ -46,6 +47,7 @@ target_link_libraries( ${PROJECT_NAME}
 )
 
 add_library( ${PROJECT_NAME}_ros_types
+  include/${PROJECT_NAME}/kinematics_ros_types.h
   src/kinematics_ros_types.cpp
 )
 target_link_libraries( ${PROJECT_NAME}_ros_types

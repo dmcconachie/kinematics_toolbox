@@ -447,7 +447,7 @@ VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajecto
 
     VectorVector6d xi( g_trajectory.size() - 1 );
 
-    for ( size_t i = 0; i < xi.size() - 1 ; i++ )
+    for ( size_t i = 0; i < xi.size() ; i++ )
     {
         xi[i] = calculateVelocity( g_trajectory[i], g_trajectory[i + 1] );
     }
