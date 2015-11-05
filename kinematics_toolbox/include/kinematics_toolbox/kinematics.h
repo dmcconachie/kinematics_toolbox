@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include <unsupported/Eigen/MatrixFunctions>
 
 namespace kinematics
@@ -73,8 +74,11 @@ namespace kinematics
   Matrix6d adj( const Eigen::Matrix4d& g );
   Eigen::Matrix3d expmExact( const Eigen::Matrix3d& w_hat, const double theta );
   Eigen::Matrix4d expTwist( const Vector6d& xi, double theta );
+  Eigen::Affine3d expTwistAffine3d( const Vector6d& xi, double theta );
   Eigen::Matrix4d expTwist( const std::vector< Vector6d >& xi,
                             const std::vector< double >& theta );
+  Eigen::Affine3d expTwistAffine3d( const std::vector< Vector6d >& xi,
+                                    const std::vector< double >& theta );
 
   ////////////////////////////////////////////////////////////////////////////////
   // Jacobians

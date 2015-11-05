@@ -262,6 +262,15 @@ Eigen::Matrix4d kinematics::expTwist( const Vector6d& xi, double theta )
     return expT;
 }
 
+Eigen::Affine3d kinematics::expTwistAffine3d( const Vector6d& xi, double theta )
+{
+    // TODO: this better
+    Eigen::Matrix4d tmp = expTwist( xi, theta );
+    Eigen::Affine3d expT;
+    expT = tmp.matrix();
+    return expT;
+}
+
 Eigen::Matrix4d kinematics::expTwist( const std::vector< Vector6d >& xi,
                                       const std::vector< double >& theta )
 {
@@ -270,6 +279,19 @@ Eigen::Matrix4d kinematics::expTwist( const std::vector< Vector6d >& xi,
     for ( size_t i = 0; i < theta.size(); i++ )
     {
       g = g * expTwist( xi[i], theta[i] );
+    }
+
+    return g;
+}
+
+Eigen::Affine3d kinematics::expTwistAffine3d( const std::vector< Vector6d >& xi,
+                                              const std::vector< double >& theta )
+{
+    Eigen::Affine3d g = Eigen::Affine3d::Identity();
+
+    for ( size_t i = 0; i < theta.size(); i++ )
+    {
+        g = g * expTwistAffine3d( xi[i], theta[i] );
     }
 
     return g;
