@@ -217,13 +217,11 @@ Matrix6d kinematics::adj( const Eigen::Matrix4d& g )
 
 Eigen::Matrix3d kinematics::expmExact( const Eigen::Matrix3d& w_hat, const double theta )
 {
-    Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
-
     // w_hat should be normalized before calling this function
     assert( std::abs(unskew( w_hat ).norm() - 1) < 1e-10 );
 
     Eigen::Matrix3d expM;
-    expM = eye3
+    expM = Eigen::Matrix3d::Identity()
            + w_hat * std::sin( theta )
            + w_hat * w_hat * ( 1 - std::cos( theta ) );
 
@@ -252,11 +250,11 @@ Eigen::Matrix4d kinematics::expTwist( const Vector6d& xi, double theta )
 
         Eigen::Matrix3d w_hat = skew( w );
         Eigen::Matrix3d exp_w_hat_theta = expmExact( w_hat, theta );
-        Eigen::Matrix3d eye3 = Eigen::Matrix3d::Identity();
 
         expT.block< 3, 3 >( 0, 0 ) = exp_w_hat_theta;
-        expT.block< 3, 1 >( 0, 3 ) = ( eye3 - exp_w_hat_theta ) * w.cross( v )
-                                     + w * w.transpose() * v * theta;
+        expT.block< 3, 1 >( 0, 3 ) =
+                ( Eigen::Matrix3d::Identity() - exp_w_hat_theta ) * w.cross( v )
+                + w * w.transpose() * v * theta;
     }
 
     return expT;
