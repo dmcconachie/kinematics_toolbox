@@ -109,9 +109,11 @@ namespace kinematics
   ////////////////////////////////////////////////////////////////////////////////
 
   Vector6d calculateVelocity( const Eigen::Affine3d& g_current,
-                              const Eigen::Affine3d& g_next );
+                              const Eigen::Affine3d& g_next,
+                              const double dt );
 
-  VectorVector6d calculateVelocities( const VectorAffine3d& g_trajectory );
+  VectorVector6d calculateVelocities( const VectorAffine3d& g_trajectory,
+                                      const double dt );
 
   Vector6d calculateError( const Eigen::Matrix4d& g_current,
                            const Eigen::Matrix4d& g_desired );

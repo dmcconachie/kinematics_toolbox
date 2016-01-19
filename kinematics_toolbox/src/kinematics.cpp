@@ -450,7 +450,8 @@ Vector6d kinematics::calculateError( const Eigen::Matrix4d& g_current,
 }
 
 Vector6d kinematics::calculateVelocity( const Eigen::Affine3d& g_current,
-                                        const Eigen::Affine3d& g_next )
+                                        const Eigen::Affine3d& g_next,
+                                        const double dt )
 {
     Vector6d xi;
 
@@ -458,10 +459,11 @@ Vector6d kinematics::calculateVelocity( const Eigen::Affine3d& g_current,
 
     xi = twistUnhat( g_diff.matrix().log() );
 
-    return xi;
+    return xi/dt;
 }
 
-VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajectory )
+VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajectory,
+                                                const double dt )
 {
     assert( g_trajectory.size() >= 2 );
 
@@ -469,7 +471,7 @@ VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajecto
 
     for ( size_t i = 0; i < xi.size() ; i++ )
     {
-        xi[i] = calculateVelocity( g_trajectory[i], g_trajectory[i + 1] );
+        xi[i] = calculateVelocity( g_trajectory[i], g_trajectory[i + 1], dt );
     }
 
     return xi;
