@@ -21,8 +21,8 @@ namespace kinematics
   typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> VectorVector3d;
   typedef std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> VectorVector4f;
   typedef std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>> VectorVector4d;
-  typedef std::vector<Vector6d, Eigen::aligned_allocator<Eigen::Vector4d>> VectorVector6d;
-  typedef std::vector<Eigen::Matrix3Xd, Eigen::aligned_allocator<Eigen::Vector4d>> VectorMatrix3Xd;
+  typedef std::vector<Vector6d> VectorVector6d;
+  typedef std::vector<Eigen::Matrix3Xd> VectorMatrix3Xd;
 
   typedef std::vector<Eigen::Quaternionf, Eigen::aligned_allocator<Eigen::Quaternionf>> VectorQuaternionf;
   typedef std::vector<Eigen::Quaterniond, Eigen::aligned_allocator<Eigen::Quaterniond>> VectorQuaterniond;
