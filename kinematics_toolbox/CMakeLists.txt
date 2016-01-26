@@ -2,8 +2,8 @@ cmake_minimum_required( VERSION 2.8.3 )
 project( kinematics_toolbox )
 
 ## Find catkin macros and libraries
-find_package( catkin REQUIRED 
-  geometry_msgs 
+find_package( catkin REQUIRED
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -32,7 +32,7 @@ include_directories( include SYSTEM
   ${catkin_INCLUDE_DIRS}
 )
 
-add_definitions( "-Wall -Wextra -Wpedantic -std=c++0x -O3" )
+add_definitions( "-Wall -Wextra -Wpedantic -std=c++0x -O3 -g" )
 
 #######################
 ## Build - Libraries ##
