@@ -437,6 +437,18 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
 // Other
 ////////////////////////////////////////////////////////////////////////////////
 
+Vector6d kinematics::calculateError( const Eigen::Affine3d& g_current,
+                                     const Eigen::Affine3d& g_desired )
+{
+    Vector6d xi;
+
+    Eigen::Affine3d g_diff = g_current.inverse() * g_desired;
+
+    xi = twistUnhat( g_diff.matrix().log() );
+
+    return xi;
+}
+
 Vector6d kinematics::calculateError( const Eigen::Matrix4d& g_current,
                                      const Eigen::Matrix4d& g_desired )
 {
