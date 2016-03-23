@@ -488,3 +488,17 @@ VectorVector6d kinematics::calculateVelocities( const VectorAffine3d& g_trajecto
 
     return xi;
 }
+
+Eigen::VectorXd kinematics::calulateDeltas( const VectorAffine3d& g )
+{
+    assert( g.size() >= 1 );
+
+    Eigen::VectorXd delta( g.size() * 6 );
+
+    for ( long ind = 0; ind < (long)g.size(); ind++ )
+    {
+        delta.segment< 6 >( ind * 6 ) = twistUnhat( g[(size_t)ind].matrix().log() );
+    }
+
+    return delta;
+}

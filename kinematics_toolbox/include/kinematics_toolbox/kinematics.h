@@ -120,6 +120,8 @@ namespace kinematics
 
   Vector6d calculateError( const Eigen::Matrix4d& g_current,
                            const Eigen::Matrix4d& g_desired );
+
+  Eigen::VectorXd calulateDeltas( const VectorAffine3d& g );
 }
 
 #endif
