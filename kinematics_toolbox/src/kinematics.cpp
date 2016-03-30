@@ -185,9 +185,9 @@ Vector6d kinematics::twistUnhat( const Eigen::Matrix4d& xi_hat )
 
 Matrix6d kinematics::adj( const Eigen::Matrix4d& g )
 {
-    Eigen::Matrix3d R = g.block< 3, 3>( 0, 0 );
-    Eigen::Vector3d p = g.block< 3, 1>( 0, 3 );
-    Eigen::Matrix3d p_hat = skew( p );
+    const Eigen::Matrix3d R = g.block< 3, 3>( 0, 0 );
+    const Eigen::Vector3d p = g.block< 3, 1>( 0, 3 );
+    const Eigen::Matrix3d p_hat = skew( p );
 
     Matrix6d adj_g;
 
@@ -263,7 +263,7 @@ Eigen::Matrix4d kinematics::expTwist( const Vector6d& xi, double theta )
 Eigen::Affine3d kinematics::expTwistAffine3d( const Vector6d& xi, double theta )
 {
     // TODO: this better
-    Eigen::Matrix4d tmp = expTwist( xi, theta );
+    const Eigen::Matrix4d tmp = expTwist( xi, theta );
     Eigen::Affine3d expT;
     expT = tmp.matrix();
     return expT;
@@ -302,13 +302,13 @@ Eigen::Affine3d kinematics::expTwistAffine3d( const std::vector< Vector6d >& xi,
 Matrix6Xd kinematics::spatialJacobian( const std::vector< Vector6d >& xi,
                                        const std::vector< double >& theta )
 {
-    int num_theta = theta.size();
+    const size_t num_theta = theta.size();
     Matrix6Xd J_s( 6, num_theta );
 
     Eigen::Matrix4d g = Eigen::Matrix4d::Identity();
     Eigen::Matrix4d expT;
 
-    for( int i = 0; i < num_theta; i++ )
+    for( size_t i = 0; i < num_theta; i++ )
     {
         if ( i == 0 )
         {
@@ -329,14 +329,14 @@ Matrix6Xd kinematics::bodyJacobian( const std::vector< Vector6d >& xi,
                                     const std::vector< double >& theta,
                                     const Eigen::Matrix4d& g_zero )
 {
-    int num_theta = theta.size();
+    const size_t num_theta = theta.size();
     Matrix6Xd J_b( 6, num_theta );
 
     Eigen::Matrix4d g = g_zero;
 
     Eigen::Matrix4d expT;
 
-    for( int i = num_theta - 1; i >= 0; i-- )
+    for( ssize_t i = (ssize_t)num_theta - 1; i >= 0; i-- )
     {
         expT = expTwist( xi[i], theta[i] );
         g = expT * g;
@@ -353,10 +353,14 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
                                            const double manipubility_threshold,
                                            const double damping_ratio )
 {
-    size_t num_joints = theta.size();
+    const size_t num_joints = theta.size();
 
-    kinematics::Matrix6d JJtranspose = J * J.transpose();
-    kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const kinematics::Matrix6d JJtranspose = J * J.transpose();
+    #pragma GCC diagnostic pop
+    const kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
     Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
 
     // Determine least-squares damping and weights, from:
@@ -372,7 +376,11 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
         }
     }
 
-    kinematics::Matrix6Xd J_w = W_x * J * W_q;
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const kinematics::Matrix6Xd J_w = W_x * J * W_q;
+    #pragma GCC diagnostic pop
 
     // find the damping ratio
     // Based on Manipulability, in 'Prior Work' of above paper
@@ -383,8 +391,8 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
         damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
     }
 
-    kinematics::Matrix6d tmp = JJtranspose + damping * kinematics::Matrix6d::Identity();
-    Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
+    const kinematics::Matrix6d tmp = JJtranspose + damping * kinematics::Matrix6d::Identity();
+    const Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
 
     return W_q * J_inv * W_x;
 }
@@ -396,11 +404,15 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
                                           const double manipubility_threshold,
                                           const double damping_ratio )
 {
-    size_t num_joints = theta.size();
-    size_t num_velocities = J.rows();
+    const size_t num_joints = theta.size();
+    const size_t num_velocities = J.rows();
 
-    Eigen::MatrixXd JJtranspose = J * J.transpose();
-    Eigen::MatrixXd W_x = Eigen::MatrixXd::Identity( num_velocities, num_velocities );
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const kinematics::Matrix6d JJtranspose = J * J.transpose();
+    #pragma GCC diagnostic pop
+    const kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
     Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
 
     // Determine least-squares damping and weights, from:
@@ -416,7 +428,11 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
         }
     }
 
-    Eigen::MatrixXd J_w = W_x * J * W_q;
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const Eigen::MatrixXd J_w = W_x * J * W_q;
+    #pragma GCC diagnostic pop
 
     // find the damping ratio
     // Based on Manipulability, in 'Prior Work' of above paper
@@ -427,8 +443,12 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
         damping = damping_ratio * std::pow( 1 - manipubility / manipubility_threshold, 2 );
     }
 
-    Eigen::MatrixXd tmp = JJtranspose + damping * Eigen::MatrixXd::Identity( num_velocities, num_velocities );
-    Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
+    const Eigen::MatrixXd tmp = JJtranspose + damping * Eigen::MatrixXd::Identity( num_velocities, num_velocities );
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const Eigen::MatrixXd J_inv = J_w.transpose() * tmp.inverse();
+    #pragma GCC diagnostic pop
 
     return W_q * J_inv * W_x;
 }
@@ -454,7 +474,11 @@ Vector6d kinematics::calculateError( const Eigen::Matrix4d& g_current,
 {
     Vector6d xi;
 
-    Eigen::Matrix4d g_diff = g_current.inverse() * g_desired;
+    // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const Eigen::Matrix4d g_diff = g_current.inverse() * g_desired;
+    #pragma GCC diagnostic pop
 
     xi = twistUnhat( g_diff.log() );
 
@@ -467,7 +491,7 @@ Vector6d kinematics::calculateVelocity( const Eigen::Affine3d& g_current,
 {
     Vector6d xi;
 
-    Eigen::Affine3d g_diff = g_current.inverse() * g_next;
+    const Eigen::Affine3d g_diff = g_current.inverse() * g_next;
 
     xi = twistUnhat( g_diff.matrix().log() );
 

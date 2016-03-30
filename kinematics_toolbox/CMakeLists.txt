@@ -7,7 +7,8 @@ find_package( catkin REQUIRED
 )
 
 ## System dependencies are found with CMake's conventions
-find_package( Eigen3 REQUIRED )
+find_package( cmake_modules REQUIRED )
+find_package( Eigen REQUIRED )
 
 ###################################
 ## catkin specific configuration ##
@@ -15,11 +16,10 @@ find_package( Eigen3 REQUIRED )
 
 catkin_package(
   INCLUDE_DIRS    include
-                  ${EIGEN3_INCLUDE_DIR} # TODO: why is this needed here with EIGEN3 as a depend later?
   LIBRARIES       ${PROJECT_NAME}
                   ${PROJECT_NAME}_ros_types
   CATKIN_DEPENDS  geometry_msgs
-  DEPENDS         EIGEN3
+  DEPENDS         Eigen
 )
 
 ###########
@@ -32,7 +32,7 @@ include_directories( include SYSTEM
   ${catkin_INCLUDE_DIRS}
 )
 
-add_definitions( "-Wall -Wextra -Wpedantic -std=c++0x -O3 -g" )
+add_definitions( "-Wall -Wextra -Wpedantic -Wconversion -Werror -std=c++0x -O3 -g" )
 
 #######################
 ## Build - Libraries ##
