@@ -310,15 +310,15 @@ Matrix6Xd kinematics::spatialJacobian( const std::vector< Vector6d >& xi,
 
     for( size_t i = 0; i < num_theta; i++ )
     {
-        if ( i == 0 )
-        {
-            J_s.block< 6, 1 >( 0, i ) = xi[i];
-        }
-        else
+        if ( i != 0 )
         {
             expT = expTwist( xi[i - 1], theta[i - 1] );
             g = g * expT;
-            J_s.block< 6, 1 >( 0, i ) = adj( g ) * xi[i];
+            J_s.block< 6, 1 >( 0, (ssize_t)i ) = adj( g ) * xi[i];
+        }
+        else
+        {
+            J_s.block< 6, 1 >( 0, (ssize_t)i ) = xi[i];
         }
     }
 
@@ -329,18 +329,18 @@ Matrix6Xd kinematics::bodyJacobian( const std::vector< Vector6d >& xi,
                                     const std::vector< double >& theta,
                                     const Eigen::Matrix4d& g_zero )
 {
-    const size_t num_theta = theta.size();
+    const ssize_t num_theta = (ssize_t)theta.size();
     Matrix6Xd J_b( 6, num_theta );
 
     Eigen::Matrix4d g = g_zero;
 
     Eigen::Matrix4d expT;
 
-    for( ssize_t i = (ssize_t)num_theta - 1; i >= 0; i-- )
+    for( ssize_t i = num_theta - 1; i >= 0; i-- )
     {
-        expT = expTwist( xi[i], theta[i] );
+        expT = expTwist( xi[(size_t)i], theta[(size_t)i] );
         g = expT * g;
-        J_b.block<6,1>( 0,i ) = adj( g.inverse() ) * xi[i];
+        J_b.block<6,1>( 0, i ) = adj( g.inverse() ) * xi[(size_t)i];
     }
 
     return J_b;
@@ -361,7 +361,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
     const kinematics::Matrix6d JJtranspose = J * J.transpose();
     #pragma GCC diagnostic pop
     const kinematics::Matrix6d W_x = kinematics::Matrix6d::Identity();
-    Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( num_joints, num_joints );
+    Eigen::MatrixXd W_q = Eigen::MatrixXd::Identity( (ssize_t)num_joints, (ssize_t)num_joints );
 
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
@@ -372,7 +372,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd( const kinematics::Matrix6Xd& J,
 
         if (  theta_to_limit < limit_threshold )
         {
-            W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
+            W_q( (ssize_t)i, (ssize_t)i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
         }
     }
 
@@ -404,8 +404,8 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
                                           const double manipubility_threshold,
                                           const double damping_ratio )
 {
-    const size_t num_joints = theta.size();
-    const size_t num_velocities = J.rows();
+    const ssize_t num_joints = (ssize_t)theta.size();
+    const ssize_t num_velocities = J.rows();
 
     // Yes, this is ugly. This is to suppress a warning on type conversion related to Eigen operations
     #pragma GCC diagnostic push
@@ -418,13 +418,13 @@ Eigen::MatrixXd kinematics::dampedPinvXd( const Eigen::MatrixXd& J,
     // Determine least-squares damping and weights, from:
     // "Robust Inverse Kinematics Using Damped Least Squares
     // with Dynamic Weighting"  NASA 1994
-    for( size_t i = 1; i < num_joints; i++ )
+    for( ssize_t i = 1; i < num_joints; i++ )
     {
-        double theta_to_limit = theta_limit - std::abs( theta[i] );
+        double theta_to_limit = theta_limit - std::abs( theta[(size_t)i] );
 
         if (  theta_to_limit < limit_threshold )
         {
-            W_q( i,i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
+            W_q( i, i ) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
         }
     }
 
@@ -517,7 +517,7 @@ Eigen::VectorXd kinematics::calulateDeltas( const VectorAffine3d& g )
 {
     assert( g.size() >= 1 );
 
-    Eigen::VectorXd delta( g.size() * 6 );
+    Eigen::VectorXd delta( 6 * (ssize_t)g.size() );
 
     for ( long ind = 0; ind < (long)g.size(); ind++ )
     {
