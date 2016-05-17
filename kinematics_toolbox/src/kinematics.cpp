@@ -370,7 +370,7 @@ Eigen::MatrixXd kinematics::dampedPinv6Xd(const kinematics::Matrix6Xd& J,
     {
         double theta_to_limit = theta_limit - std::abs(theta[i]);
 
-        if ( theta_to_limit < limit_threshold)
+        if (theta_to_limit < limit_threshold)
         {
             W_q((ssize_t)i, (ssize_t)i) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
         }
@@ -422,7 +422,7 @@ Eigen::MatrixXd kinematics::dampedPinvXd(const Eigen::MatrixXd& J,
     {
         double theta_to_limit = theta_limit - std::abs(theta[(size_t)i]);
 
-        if ( theta_to_limit < limit_threshold)
+        if (theta_to_limit < limit_threshold)
         {
             W_q(i, i) = 0.1 + 0.9 * theta_to_limit / limit_threshold;
         }
