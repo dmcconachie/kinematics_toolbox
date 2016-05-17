@@ -13,8 +13,8 @@ namespace kinematics_ros_types
   // Vector3 operators
   //////////////////////////////////////////////////////////////////////////////
   
-  inline geometry_msgs::Vector3 operator+ ( 
-      geometry_msgs::Vector3 l, const geometry_msgs::Vector3& r )
+  inline geometry_msgs::Vector3 operator+ (
+      geometry_msgs::Vector3 l, const geometry_msgs::Vector3& r)
   {
     l.x += r.x;
     l.y += r.y;
@@ -22,8 +22,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator- ( 
-      geometry_msgs::Vector3 l, const geometry_msgs::Vector3& r )
+  inline geometry_msgs::Vector3 operator- (
+      geometry_msgs::Vector3 l, const geometry_msgs::Vector3& r)
   {
     l.x -= r.x;
     l.y -= r.y;
@@ -31,8 +31,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator+= ( 
-      geometry_msgs::Vector3& l, const geometry_msgs::Vector3& r )
+  inline geometry_msgs::Vector3 operator+= (
+      geometry_msgs::Vector3& l, const geometry_msgs::Vector3& r)
   {
     l.x += r.x;
     l.y += r.y;
@@ -40,8 +40,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator-= ( 
-      geometry_msgs::Vector3& l, const geometry_msgs::Vector3& r )
+  inline geometry_msgs::Vector3 operator-= (
+      geometry_msgs::Vector3& l, const geometry_msgs::Vector3& r)
   {
     l.x -= r.x;
     l.y -= r.y;
@@ -50,8 +50,8 @@ namespace kinematics_ros_types
   }
 
 
-  inline geometry_msgs::Vector3 operator* ( 
-      geometry_msgs::Vector3 l, const double& r )
+  inline geometry_msgs::Vector3 operator* (
+      geometry_msgs::Vector3 l, const double& r)
   {
     l.x *= r;
     l.y *= r;
@@ -59,8 +59,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator/ ( 
-      geometry_msgs::Vector3 l, const double& r )
+  inline geometry_msgs::Vector3 operator/ (
+      geometry_msgs::Vector3 l, const double& r)
   {
     l.x /= r;
     l.y /= r;
@@ -68,8 +68,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator*= ( 
-      geometry_msgs::Vector3& l, const double& r )
+  inline geometry_msgs::Vector3 operator*= (
+      geometry_msgs::Vector3& l, const double& r)
   {
     l.x *= r;
     l.y *= r;
@@ -77,8 +77,8 @@ namespace kinematics_ros_types
     return l;
   }
 
-  inline geometry_msgs::Vector3 operator/= ( 
-      geometry_msgs::Vector3& l, const double& r )
+  inline geometry_msgs::Vector3 operator/= (
+      geometry_msgs::Vector3& l, const double& r)
   {
     l.x /= r;
     l.y /= r;
@@ -87,41 +87,41 @@ namespace kinematics_ros_types
   }
 
 
-  inline double norm( const geometry_msgs::Vector3& vec )
+  inline double norm(const geometry_msgs::Vector3& vec)
   {
-    return sqrt( ( vec.x * vec.x ) + ( vec.y * vec.y ) + ( vec.z * vec.z ) );
+    return sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z));
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // Twist operators
   //////////////////////////////////////////////////////////////////////////////
   
-  inline geometry_msgs::Twist operator+ 
-    ( geometry_msgs::Twist l, const geometry_msgs::Twist& r )
+  inline geometry_msgs::Twist operator+ (
+    geometry_msgs::Twist l, const geometry_msgs::Twist& r)
   {
     l.linear += r.linear;
     l.angular += r.angular;
     return l;
   }
 
-  inline geometry_msgs::Twist operator- 
-    ( geometry_msgs::Twist l, const geometry_msgs::Twist& r )
+  inline geometry_msgs::Twist operator- (
+    geometry_msgs::Twist l, const geometry_msgs::Twist& r)
   {
     l.linear -= r.linear;
     l.angular -= r.angular;
     return l;
   }
 
-  inline geometry_msgs::Twist operator+= 
-    ( geometry_msgs::Twist &l, const geometry_msgs::Twist& r )
+  inline geometry_msgs::Twist operator+= (
+    geometry_msgs::Twist &l, const geometry_msgs::Twist& r)
   {
     l.linear += r.linear;
     l.angular += r.angular;
     return l;
   }
 
-  inline geometry_msgs::Twist operator-= 
-    ( geometry_msgs::Twist &l, const geometry_msgs::Twist& r )
+  inline geometry_msgs::Twist operator-= (
+    geometry_msgs::Twist &l, const geometry_msgs::Twist& r)
   {
     l.linear -= r.linear;
     l.angular -= r.angular;
@@ -129,48 +129,48 @@ namespace kinematics_ros_types
   }
 
 
-  inline geometry_msgs::Twist operator* 
-    ( geometry_msgs::Twist l, const double& r )
+  inline geometry_msgs::Twist operator* (
+    geometry_msgs::Twist l, const double& r)
   {
     l.linear *= r;
     l.angular *= r;
     return l;
   }
 
-  inline geometry_msgs::Twist operator/ 
-    ( geometry_msgs::Twist l, const double& r )
+  inline geometry_msgs::Twist operator/ (
+    geometry_msgs::Twist l, const double& r)
   {
     l.linear /= r;
     l.angular /= r;
     return l;
   }
 
-  inline geometry_msgs::Twist operator*= 
-    ( geometry_msgs::Twist &l, const double& r )
+  inline geometry_msgs::Twist operator*= (
+    geometry_msgs::Twist &l, const double& r)
   {
     l.linear *= r;
     l.angular *= r;
     return l;
   }
 
-  inline geometry_msgs::Twist operator/= 
-    ( geometry_msgs::Twist &l, const double& r )
+  inline geometry_msgs::Twist operator/= (
+    geometry_msgs::Twist &l, const double& r)
   {
     l.linear /= r;
     l.angular /= r;
     return l;
   }
 
-  inline geometry_msgs::Twist operator* 
-    ( const double& l, geometry_msgs::Twist r )
+  inline geometry_msgs::Twist operator* (
+    const double& l, geometry_msgs::Twist r)
   {
     r.linear *= l;
     r.angular *= l;
     return r;
   }
 
-  inline geometry_msgs::Twist operator/ 
-    ( const double& l, geometry_msgs::Twist r )
+  inline geometry_msgs::Twist operator/ (
+    const double& l, geometry_msgs::Twist r)
   {
     r.linear *= l;
     r.angular /= l;
@@ -210,8 +210,8 @@ namespace kinematics_ros_types
    * \return A body velocity in the current frame that moves us from \a current
    * to \a desired.
    */
-  geometry_msgs::Twist calculateError( const geometry_msgs::Pose2D& desired,
-                                       const geometry_msgs::Pose2D& current );
+  geometry_msgs::Twist calculateError(const geometry_msgs::Pose2D& desired,
+                                      const geometry_msgs::Pose2D& current);
 
 }
 
