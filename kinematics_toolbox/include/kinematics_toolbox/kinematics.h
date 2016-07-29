@@ -80,6 +80,10 @@ namespace kinematics
   Eigen::Affine3d expTwistAffine3d(const std::vector<Vector6d>& xi,
                                    const std::vector<double>& theta);
 
+  VectorAffine3d applyTwist(const VectorAffine3d& starting_pose,
+                            const VectorVector6d& xi,
+                            std::vector<double> theta = std::vector<double>(0));
+
   ////////////////////////////////////////////////////////////////////////////////
   // Jacobians
   ////////////////////////////////////////////////////////////////////////////////

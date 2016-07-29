@@ -276,7 +276,7 @@ Eigen::Matrix4d kinematics::expTwist(const std::vector<Vector6d>& xi,
 
     for (size_t i = 0; i < theta.size(); i++)
     {
-      g = g * expTwist(xi[i], theta[i]);
+        g = g * expTwist(xi[i], theta[i]);
     }
 
     return g;
@@ -293,6 +293,29 @@ Eigen::Affine3d kinematics::expTwistAffine3d(const std::vector<Vector6d>& xi,
     }
 
     return g;
+}
+
+VectorAffine3d kinematics::applyTwist(const VectorAffine3d& starting_pose,
+                                      const VectorVector6d& xi,
+                                      std::vector<double> theta)
+{
+    const size_t num_poses = starting_pose.size();
+    if (theta.size() == 0)
+    {
+        theta.resize(num_poses, 1.0);
+    }
+
+    assert(num_poses == xi.size());
+    assert(num_poses == theta.size());
+
+    VectorAffine3d result(num_poses);
+    for (size_t pose_ind = 0; pose_ind < num_poses; pose_ind++)
+    {
+        result[pose_ind] = starting_pose[pose_ind] *
+                expTwistAffine3d(xi[pose_ind], theta[pose_ind]);
+    }
+
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
